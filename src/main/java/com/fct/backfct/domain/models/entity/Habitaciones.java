@@ -34,6 +34,7 @@ public class Habitaciones implements Serializable {
     private String descripcion;
     private Integer capacidad;
 
-    @Column(name = "id_estado")
-    private Long idEstado;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_estado",referencedColumnName = "id_estado")
+    private EstadosHabitacion estadoHabitacion;
 }

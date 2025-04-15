@@ -1,9 +1,8 @@
-package com.fct.backfct.domain.services;
+package com.fct.backfct.domain.services.Cliente;
 
 import com.fct.backfct.domain.converters.ClientesMapper;
 import com.fct.backfct.domain.dto.ClientesDTO;
 import com.fct.backfct.domain.models.dao.IClientesDao;
-import com.fct.backfct.domain.models.entity.Clientes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

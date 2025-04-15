@@ -1,8 +1,7 @@
 package com.fct.backfct.web;
 
 import com.fct.backfct.domain.dto.ClientesDTO;
-import com.fct.backfct.domain.models.entity.Clientes;
-import com.fct.backfct.domain.services.IClientesService;
+import com.fct.backfct.domain.services.Cliente.IClientesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
