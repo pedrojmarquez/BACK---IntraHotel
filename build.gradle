@@ -25,13 +25,13 @@ repositories {
 	}
 }
 
-group = 'com.preving.restapi'
+group = 'com.fct.backfct'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 jar {
 	manifest {
-		attributes 'Main-Class': 'com.preving.restapi.base.RestApiBaseApplication'
+		attributes 'Main-Class': 'com.fct.backfct.RestApiBaseApplication'
 	}
 }
 

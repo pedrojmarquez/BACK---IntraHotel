@@ -6,14 +6,14 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class RestApiBaseApplication extends SpringBootServletInitializer {
+public class BackFctApplication extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(RestApiBaseApplication.class);
+		return application.sources(BackFctApplication.class);
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(RestApiBaseApplication.class, args);
+		SpringApplication.run(BackFctApplication.class, args);
 	}
 }
