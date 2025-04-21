@@ -25,7 +25,7 @@ public class UsuarioPrincipal implements UserDetails {
 
     public static UsuarioPrincipal build(Empleados empleados){
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(empleados.getRol().getNombreRol().equals("coordinador-tecnico") ? new SimpleGrantedAuthority("coordinador-tecnico") : new SimpleGrantedAuthority("tecnico"));
+        authorities.add(new SimpleGrantedAuthority(empleados.getRol().getNombreRol().toLowerCase()));
         return new UsuarioPrincipal(empleados.getId(), empleados.getNombre(), empleados.getEmail(), empleados.getClave(), authorities);
     }
 
