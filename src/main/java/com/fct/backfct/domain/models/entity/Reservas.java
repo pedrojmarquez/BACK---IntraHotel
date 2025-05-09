@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -33,15 +34,14 @@ public class Reservas implements Serializable {
     @JoinColumn(name = "id_habitacion",referencedColumnName = "id_habitacion")
     private Habitaciones habitacion;
 
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Europe/Madrid")
     @Column(name = "fecha_entrada")
-    private Date fechaEntrada;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm",timezone = "Europe/Madrid")
+    private LocalDateTime fechaEntrada;
 
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Europe/Madrid")
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm",timezone = "Europe/Madrid")
     @Column(name = "fecha_salida")
-    private Date fechaSalida;
+    private LocalDateTime fechaSalida;
 
     @Column(name = "precio_total")
     private Double precioTotal;

@@ -2,6 +2,7 @@ package com.fct.backfct.domain.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Builder
@@ -12,8 +13,8 @@ import java.util.Date;
 public class ReservasDTO {
 
     private Long idReserva;
-    private Date fechaEntrada;
-    private Date fechaSalida;
+    private LocalDateTime fechaEntrada;
+    private LocalDateTime fechaSalida;
     private Date fechaReserva;
     private Double precioTotal;
     private ClientesDTO cliente;
