@@ -44,6 +44,10 @@ ext {
 
 dependencies {
 
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+
+
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'

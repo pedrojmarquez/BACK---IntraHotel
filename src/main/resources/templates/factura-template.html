@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            font-size: 14px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section p {
+            margin: 4px 0;
+        }
+        .totales {
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        .totales p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Factura</h1>
+
+<div class="section">
+    <p><strong>Cliente:</strong> <span th:text="${nombreCliente}">Nombre Apellido</span></p>
+    <p><strong>Método de pago:</strong> <span th:text="${metodoPago}">Tarjeta</span></p>
+    <p><strong>Fecha:</strong> <span th:text="${fecha}">2025-05-11</span></p>
+</div>
+
+<div class="section totales">
+    <p>Subtotal: <span th:text="${subtotal}">100.00</span> €</p>
+    <p>Total: <span th:text="${total}">121.00</span> €</p>
+</div>
+</body>
+</html>

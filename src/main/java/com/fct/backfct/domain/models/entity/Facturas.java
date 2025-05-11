@@ -30,8 +30,9 @@ public class Facturas implements Serializable {
     @JoinColumn(name = "id_reserva",referencedColumnName = "id_reserva")
     private Reservas reserva;
 
-    @Column(name = "numero_factura")
-    private String numeroFactura;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_cliente",referencedColumnName = "id_cliente")
+    private Clientes cliente;
 
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Europe/Madrid")
@@ -47,16 +48,6 @@ public class Facturas implements Serializable {
     @JoinColumn(name = "id_metodo_pago",referencedColumnName = "id_metodo_pago")
     private MetodosPago metodoPago;
 
-    @Column(name = "nombre_cliente")
-    private String nombreCliente;
-
-
-    @Column(name = "dni_cliente")
-    private String dniCliente;
-
-
-    @Column(name = "direccion_cliente")
-    private String direccionCliente;
 
 
     @Column(name = "ruta_fichero")

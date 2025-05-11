@@ -6,8 +6,6 @@ import com.fct.backfct.domain.models.dao.IHabitacionesDao;
 import com.fct.backfct.domain.models.entity.Habitaciones;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
