@@ -55,6 +55,10 @@ public class Reservas implements Serializable {
     @Column(name = "fecha_reserva")
     private Date fechaReserva;
 
+
+    @Column(name = "id_factura")
+    private Long Idfactura;
+
     @PrePersist
     public void prePersist() {
         this.fechaReserva = new Date();

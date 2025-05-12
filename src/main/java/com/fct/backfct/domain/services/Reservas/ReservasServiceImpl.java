@@ -14,12 +14,14 @@ import com.fct.backfct.domain.models.dao.IServiciosDao;
 import com.fct.backfct.domain.models.entity.Facturas;
 import com.fct.backfct.domain.models.entity.Reservas;
 import com.fct.backfct.domain.services.Facturas.FacturasServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ReservasServiceImpl implements IReservasService {
 
@@ -87,14 +89,17 @@ public class ReservasServiceImpl implements IReservasService {
             factura.setMetodoPago(facturasService.getMetodoPago(metodoPago));
 
             factura.setRutaFichero(facturasService.generarFacturaPDF(factura));
-            factura.setNombreFichero(factura.getRutaFichero().substring(factura.getRutaFichero().lastIndexOf("/") + 1));
+
+            //obtener el nombre del fichero a partir de la ruta
+            factura.setNombreFichero(factura.getRutaFichero().substring(factura.getRutaFichero().lastIndexOf("\\") + 1));
             FacturasDTO facturaDTO = facturasMapper.toDto(factura);
 
 
             reserva.setEstadoReserva(estadoReservaDao.findById(4L).orElse(null));
 
-            facturasService.save(facturaDTO);
-            update(reservasMapper.toDto(reserva));
+            Facturas facturaGuardada = facturasMapper.toEntity(facturasService.save(facturaDTO));
+            reserva.setIdfactura(facturaGuardada.getIdFactura());
+            reservasDao.save(reserva);
             return facturaDTO;
         }catch (Exception e) {
             e.printStackTrace();
