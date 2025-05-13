@@ -1,9 +1,6 @@
 package com.fct.backfct.domain.services.Reservas;
 
-import com.fct.backfct.domain.dto.EstadosReservaDTO;
-import com.fct.backfct.domain.dto.FacturasDTO;
-import com.fct.backfct.domain.dto.ReservasDTO;
-import com.fct.backfct.domain.dto.ServiciosDTO;
+import com.fct.backfct.domain.dto.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,4 +18,7 @@ public interface IReservasService {
     List<ServiciosDTO> getServiciosContratados(List<String> nombres);
 
     FacturasDTO checkout(ReservasDTO reservasDTO, String metodoPago) throws IOException;
+
+    List<ReservaServicioDTO> saveServiciosContratados(List<ReservaServicioDTO> serviciosContratadosDto);
+
 }

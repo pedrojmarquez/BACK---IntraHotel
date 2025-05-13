@@ -1,9 +1,6 @@
 package com.fct.backfct.web;
 
-import com.fct.backfct.domain.dto.EstadosReservaDTO;
-import com.fct.backfct.domain.dto.FacturasDTO;
-import com.fct.backfct.domain.dto.ReservasDTO;
-import com.fct.backfct.domain.dto.ServiciosDTO;
+import com.fct.backfct.domain.dto.*;
 import com.fct.backfct.domain.services.Reservas.IReservasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -76,6 +73,16 @@ public class ReservasController {
     public ResponseEntity<FacturasDTO> checkout(@RequestBody ReservasDTO reservasDTO, @RequestParam String metodoPago) {
         try {
             return ResponseEntity.ok(reservasService.checkout(reservasDTO, metodoPago));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/servicios-contratados/save")
+    public ResponseEntity<List<ReservaServicioDTO>> saveServiciosContratados(@RequestBody List<ReservaServicioDTO> serviciosContratados) {
+        try {
+            return ResponseEntity.ok(reservasService.saveServiciosContratados(serviciosContratados));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

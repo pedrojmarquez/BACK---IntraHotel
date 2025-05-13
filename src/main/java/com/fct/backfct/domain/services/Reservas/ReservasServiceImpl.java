@@ -1,18 +1,14 @@
 package com.fct.backfct.domain.services.Reservas;
 
-import com.fct.backfct.domain.converters.EstadosReservasMapper;
-import com.fct.backfct.domain.converters.FacturasMapper;
-import com.fct.backfct.domain.converters.ReservasMapper;
-import com.fct.backfct.domain.converters.ServiciosMapper;
-import com.fct.backfct.domain.dto.EstadosReservaDTO;
-import com.fct.backfct.domain.dto.FacturasDTO;
-import com.fct.backfct.domain.dto.ReservasDTO;
-import com.fct.backfct.domain.dto.ServiciosDTO;
+import com.fct.backfct.domain.converters.*;
+import com.fct.backfct.domain.dto.*;
 import com.fct.backfct.domain.models.dao.IEstadoReservaDao;
 import com.fct.backfct.domain.models.dao.IReservasDao;
+import com.fct.backfct.domain.models.dao.IReservasServiciosDao;
 import com.fct.backfct.domain.models.dao.IServiciosDao;
 import com.fct.backfct.domain.models.entity.Facturas;
 import com.fct.backfct.domain.models.entity.Reservas;
+import com.fct.backfct.domain.models.entity.ReservasServicios;
 import com.fct.backfct.domain.services.Facturas.FacturasServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +45,12 @@ public class ReservasServiceImpl implements IReservasService {
     @Autowired
     private FacturasMapper facturasMapper;
 
+    @Autowired
+    private IReservasServiciosDao reservasServiciosDao;
+
+    @Autowired
+    private ReservaServicioMapper reservasServiciosMapper;
+
     @Override
     public List<ReservasDTO> findAll() {
         return reservasMapper.toListDtos(reservasDao.findAll());
@@ -84,7 +86,7 @@ public class ReservasServiceImpl implements IReservasService {
             factura.setReserva(reserva);
             factura.setCliente(reserva.getCliente());
             factura.setSubtotal(reserva.getPrecioTotal());
-            factura.setIva(reserva.getPrecioTotal() * 0.21);
+            factura.setIva(reserva.getPrecioTotal() * 0.1);
             factura.setTotal(factura.getSubtotal() + factura.getIva());
             factura.setMetodoPago(facturasService.getMetodoPago(metodoPago));
 
@@ -99,6 +101,7 @@ public class ReservasServiceImpl implements IReservasService {
 
             Facturas facturaGuardada = facturasMapper.toEntity(facturasService.save(facturaDTO));
             reserva.setIdfactura(facturaGuardada.getIdFactura());
+
             reservasDao.save(reserva);
             return facturaDTO;
         }catch (Exception e) {
@@ -108,5 +111,11 @@ public class ReservasServiceImpl implements IReservasService {
 
 
         return null;
+    }
+
+    @Override
+    public List<ReservaServicioDTO> saveServiciosContratados(List<ReservaServicioDTO> serviciosContratadosDto) {
+        List<ReservasServicios> serviciosContratados = reservasServiciosMapper.toListEntities(serviciosContratadosDto);
+        return reservasServiciosMapper.toListDtos(reservasServiciosDao.saveAll(serviciosContratados));
     }
 }

@@ -27,7 +27,15 @@ public class ReservasServicios implements Serializable {
     @JoinColumn(name = "id_servicio",referencedColumnName = "id_servicio")
     private Servicios servicio;
 
+    @Column(name = "servicio")
+    private String nombreServicio;
     private Integer cantidad;
-
     private Double precio;
+    private Double total;
+
+
+    @PrePersist
+    public void prePersist() {
+        this.total = this.precio * this.cantidad;
+    }
 }
