@@ -3,43 +3,156 @@
 <head>
     <meta charset="UTF-8" />
     <title>Factura</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
-            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            width: 100%;
         }
-        h1 {
+        .header {
             text-align: center;
             margin-bottom: 30px;
+            display: flex;
         }
-        .section {
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #000;
+        }
+        .titulo, .logo{
+            width: 48%;
+            display: inline-block;
+            vertical-align: center;
+            horiz-align: center;
+        }
+        .invoice-number {
+            font-size: 18px;
             margin-bottom: 20px;
         }
-        .section p {
-            margin: 4px 0;
+        .client-info, .company-info {
+            width: 48%;
+            display: inline-block;
+            vertical-align: top;
+            margin-bottom: 30px;
         }
-        .totales {
-            border-top: 1px solid #333;
-            padding-top: 10px;
+        .company-info {
+            text-align: right;
         }
-        .totales p {
+        .section-title {
             font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .tax-row {
+            font-style: italic;
+        }
+        .payment-info {
+            margin-top: 120px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+            display: flex;
         }
     </style>
 </head>
 <body>
-<h1>Factura</h1>
+<div class="header" style="background-color: #bdecb6; padding: 20px;">
 
-<div class="section">
-    <p><strong>Cliente:</strong> <span th:text="${nombreCliente}">Nombre Apellido</span></p>
-    <p><strong>Método de pago:</strong> <span th:text="${metodoPago}">Tarjeta</span></p>
-    <p><strong>Fecha:</strong> <span th:text="${fecha}">2025-05-11</span></p>
+    <div class="titulo">
+        <h1>FACTURA</h1>
+        <div class="invoice-number">N°: 0<span th:text="${numeroFactura}"></span></div>
+    </div>
+    <div class="logo">
+        <img src="classpath:/imagenes/logoSimple.png" alt="LOGO" style="width: 100px; height: 100px;"/>
+    </div>
+
+
 </div>
 
-<div class="section totales">
-    <p>Subtotal: <span th:text="${subtotal}">100.00</span> €</p>
-    <p>Total: <span th:text="${total}">121.00</span> €</p>
+<div class="client-info">
+    <div class="section-title">DATOS DEL CLIENTE</div>
+    <div><span th:text="${nombreCliente}"></span></div>
+    <div><span th:text="${emailCliente}"></span></div>
+    <div><span th:text="${telefonoCliente}"></span></div>
+    <div><span th:text="${direccionCliente}"></span></div>
+</div>
+
+<div class="company-info">
+    <div class="section-title">DATOS DE LA EMPRESA</div>
+    <div>IntraHotel</div>
+    <div>intrahotel.soporte@gmail.com</div>
+    <div>+34 674 745 709</div>
+    <div>Calle Victor Moreno Márquez 4, 06009 Badajoz</div>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Detalle</th>
+        <th>Cantidad</th>
+        <th>Precio</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Habitacion: <span th:text="${nombreHabitacion}"></span></td>
+        <td><span th:text="${numeroNoches}"></span> (noches)</td>
+        <td><span th:text="${precioHabitacion}"></span> €</td>
+        <td><span th:text="${totalHabitacion}"></span> €</td>
+    </tr>
+    <tr th:each="item : ${servicios}">
+        <td><span th:text="${item.nombreServicio}"></span></td>
+        <td><span th:text="${item.cantidad}"></span></td>
+        <td><span th:text="${item.precio}"></span> €</td>
+        <td><span th:text="${item.total}"></span> €</td>
+    </tr>
+
+    <tr class="tax-row">
+        <td colspan="3">IVA 21%</td>
+        <td><span th:text="${totalIVA}"></span> €</td>
+    </tr>
+    <tr class="total-row">
+        <td colspan="3">TOTAL</td>
+        <td><span th:text="${totalFactura}"></span> €</td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="payment-info">
+    <div class="section-title">INFORMACIÓN DE PAGO</div>
+    <div><span th:text="${metodoPago}"></span></div>
+    <div>Nombre: <span th:text="${nombreCliente}"></span></div>
+    <div>Fecha: <span th:text="${fechaPago}"></span></div>
+</div>
+
+<div class="footer" style="background-color: #bdecb6;">
+    WWW.IntraHotel.ES
 </div>
 </body>
 </html>
