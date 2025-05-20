@@ -2,6 +2,7 @@ server:
   port: 8081
   servlet:
     context-path: /hotel
+  address: 0.0.0.0
 
 # ===============================
 # = JWT
@@ -15,6 +16,13 @@ jwt:
     authentication:
       path: /login
 
+
+
+
+
+
+
+
 # Configuracion para springdoc
 # path: Pagina personalizable para acceder a swagger
 # supported-submit-methods: Propiedad para no incluir el try out dende de cada endpoint
@@ -25,12 +33,31 @@ springdoc:
     supported-submit-methods: []
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: intrahotel.soporte@gmail.com
+    password: nfih pfbl eosr mnoi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
   application:
     # Name used to register the app in the discovery server, aka the app ID.
     # Must match the K8s service name
     name: back-fct
     # INSTANCE_ID is an env var holding the K8s pod ID
     instance-id: ${INSTANCE_ID:${spring.application.name}}
+
+
 
   jackson:
     serialization:
@@ -68,9 +95,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-  servlet:
-    multipart:
-    max-file-size: 50MB
+
   mvc:
     async:
       request-timeout: 300000

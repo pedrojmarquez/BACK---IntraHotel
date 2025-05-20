@@ -6,14 +6,18 @@ import com.fct.backfct.domain.models.dao.IEstadoReservaDao;
 import com.fct.backfct.domain.models.dao.IReservasDao;
 import com.fct.backfct.domain.models.dao.IReservasServiciosDao;
 import com.fct.backfct.domain.models.dao.IServiciosDao;
+import com.fct.backfct.domain.models.entity.Clientes;
 import com.fct.backfct.domain.models.entity.Facturas;
 import com.fct.backfct.domain.models.entity.Reservas;
 import com.fct.backfct.domain.models.entity.ReservasServicios;
+import com.fct.backfct.domain.services.EmailService;
 import com.fct.backfct.domain.services.Facturas.FacturasServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
 
@@ -51,9 +55,12 @@ public class ReservasServiceImpl implements IReservasService {
     @Autowired
     private ReservaServicioMapper reservasServiciosMapper;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public List<ReservasDTO> findAll() {
-        return reservasMapper.toListDtos(reservasDao.findAll());
+        return reservasMapper.toListDtos(reservasDao.getReservasOrdenadasPorFecha());
     }
 
     @Override
@@ -103,6 +110,9 @@ public class ReservasServiceImpl implements IReservasService {
             reserva.setIdfactura(facturaGuardada.getIdFactura());
 
             reservasDao.save(reserva);
+
+            enviarFactura(reserva.getCliente(),facturaGuardada.getRutaFichero());
+
             return facturaDTO;
         }catch (Exception e) {
             e.printStackTrace();
@@ -111,6 +121,19 @@ public class ReservasServiceImpl implements IReservasService {
 
 
         return null;
+    }
+
+    public void enviarFactura(Clientes cliente, String rutaPdf) throws MessagingException {
+        Context contexto = new Context();
+        contexto.setVariable("nombre", cliente.getNombre());
+
+        emailService.enviarFacturaConAdjunto(
+                cliente.getEmail(),
+                "Su Factura de IntraHotel",
+                "factura-correo",  // sin .html
+                contexto,
+                rutaPdf
+        );
     }
 
     @Override

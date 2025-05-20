@@ -29,4 +29,10 @@ public class HabitacionesMapper {
         Type listType = new TypeToken<List<HabitacionesDTO>>() {}.getType();
         return mapper.map(habitaciones, listType);
     }
+
+    //metodo para convertir una lista de dtos a una lista de entidades
+    public List<Habitaciones> toListEntities(List<HabitacionesDTO> habitaciones) {
+        Type listType = new TypeToken<List<Habitaciones>>() {}.getType();
+        return mapper.map(habitaciones, listType);
+    }
 }

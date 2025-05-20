@@ -50,10 +50,9 @@ public class Reservas implements Serializable {
     @JoinColumn(name = "id_estado_reserva",referencedColumnName = "id_estado_reserva")
     private EstadosReserva estadoReserva;
 
-    @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Europe/Madrid")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm",timezone = "Europe/Madrid")
     @Column(name = "fecha_reserva")
-    private Date fechaReserva;
+    private LocalDateTime fechaReserva;
 
 
     @Column(name = "id_factura")
@@ -61,7 +60,7 @@ public class Reservas implements Serializable {
 
     @PrePersist
     public void prePersist() {
-        this.fechaReserva = new Date();
+        this.fechaReserva = LocalDateTime.now();
     }
 
 

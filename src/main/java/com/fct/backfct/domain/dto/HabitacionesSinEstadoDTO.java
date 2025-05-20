@@ -10,6 +10,7 @@ import lombok.*;
 public class HabitacionesSinEstadoDTO {
     private Long idHabitacion;
     private String numeroHabitacion;
+    private Integer planta;
     private String tipo;
     private Double precioNoche;
     private String descripcion;

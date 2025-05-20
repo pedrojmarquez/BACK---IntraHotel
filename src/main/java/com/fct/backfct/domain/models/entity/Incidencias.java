@@ -29,6 +29,7 @@ public class Incidencias implements Serializable {
 
     @Column(name = "id_empleado_reporta")
     private Long idEmpleadoReporta;
+
     private String descripcion;
 
     @Column(name = "fecha_reporte")

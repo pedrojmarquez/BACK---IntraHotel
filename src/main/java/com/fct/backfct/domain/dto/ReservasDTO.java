@@ -15,7 +15,7 @@ public class ReservasDTO {
     private Long idReserva;
     private LocalDateTime fechaEntrada;
     private LocalDateTime fechaSalida;
-    private Date fechaReserva;
+    private LocalDateTime fechaReserva;
     private Double precioTotal;
     private ClientesDTO cliente;
     private HabitacionesSinEstadoDTO habitacion;

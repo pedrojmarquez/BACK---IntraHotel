@@ -26,6 +26,8 @@ public class Habitaciones implements Serializable {
     @Column(name = "numero_habitacion")
     private String numeroHabitacion;
 
+    private Integer planta;
+
     private String tipo;
 
     @Column(name = "precio_noche")

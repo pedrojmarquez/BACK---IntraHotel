@@ -38,15 +38,22 @@ jar {
 
 
 
+
+
+
 ext {
 	logbackEncoderVersion = '7.2'
 }
 
 dependencies {
 
+	//generar pfd de la factura
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
 
+
+	//enviar correo
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 

@@ -27,4 +27,13 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
             @Param("capacidad") Integer capacidad
     );
 
+
+    @Query("""
+    SELECT h FROM Habitaciones h
+    WHERE h.estadoHabitacion.idEstado IN (3, 5)
+    AND (:planta IS NULL OR h.planta = :planta)
+    ORDER BY h.numeroHabitacion
+""")
+    List<Habitaciones> findHabitacionesLimpieza(@Param("planta") Integer planta);
+
 }
