@@ -4,6 +4,7 @@ import com.fct.backfct.domain.converters.EstadosIncidenciaMapper;
 import com.fct.backfct.domain.converters.HabitacionesMapper;
 import com.fct.backfct.domain.converters.ImagenesIncidenciaMapper;
 import com.fct.backfct.domain.dto.EstadosIncidenciaDTO;
+import com.fct.backfct.domain.dto.FiltroBusquedaDTO;
 import com.fct.backfct.domain.dto.HabitacionesDTO;
 import com.fct.backfct.domain.dto.IncidenciasDTO;
 import com.fct.backfct.domain.models.dao.*;
@@ -11,12 +12,14 @@ import com.fct.backfct.domain.models.entity.EstadosHabitacion;
 import com.fct.backfct.domain.models.entity.Habitaciones;
 import com.fct.backfct.domain.models.entity.ImagenesIncidencia;
 import com.fct.backfct.domain.models.entity.Incidencias;
+import com.fct.backfct.domain.services.EmailService;
 import com.fct.backfct.security.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +61,9 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
     @Autowired
     private ImagenesIncidenciaMapper imagenesIncidenciaMapper;
+
+    @Autowired
+    private EmailService emailService;
 
 
 
@@ -147,6 +153,13 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
         incidenciaDTO.setEstado(estadosIncidenciaMapper.toDto( estadosIncidenciaDao.findById(incidencia.getIdEstadoIncidencia()).orElse(null)));
         incidenciaDTO.setImagenes(imagenesIncidenciaMapper.toListDtos(imagenesIncidencia));
 
+        // 3. Notificar la incidencia con imajenes adjuntas por correo
+//        try {
+//            emailService.sendIncidencia(incidenciaDTO);
+//        } catch (MessagingException e) {
+//            throw new RuntimeException(e);
+//        }
+
         return incidenciaDTO;
     }
 
@@ -166,4 +179,41 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
         }
     }
 
+
+
+    @Override
+    public List<Habitaciones> buscarPorFiltrosHabitacion(FiltroBusquedaDTO filtro) {
+        return habitacionesDao.buscarPorFiltrosHabitacion(
+                vacioANullInt(filtro.getCapacidad()),
+                vacioANullString(filtro.getEstado()),
+                vacioANullString(filtro.getNumeroHabitacion()),
+                vacioANullString(filtro.getTipo()),
+                vacioANullInt(filtro.getPlanta())
+        );
+    }
+
+
+
+    @Override
+    public List<Habitaciones> buscarPorFiltrosCliente(FiltroBusquedaDTO filtro) {
+        // Aquí buscar habitaciones asociadas a clientes según los filtros que definieras
+        // (por ejemplo: buscar reservas del cliente y de ahí habitaciones)
+        return null;
+    }
+
+    @Override
+    public List<Habitaciones> buscarPorFiltrosReserva(FiltroBusquedaDTO filtro) {
+        // Buscar habitaciones según filtros relacionados con reservas
+        return null;
+    }
+
+
+    // Metodo para convertir "" a null para que el query ignore ese filtro
+    private String vacioANullString(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s;
+    }
+
+    private Integer vacioANullInt(Integer capacidad) {
+        return (capacidad == null) ? null : capacidad;
+    }
 }

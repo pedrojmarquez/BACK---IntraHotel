@@ -13,6 +13,8 @@ public interface IReservasService {
 
     ReservasDTO update(ReservasDTO reservasDTO);
 
+    ReservasDTO updateEstadosReservas(ReservasDTO reservasDTO);
+
     ReservasDTO save(ReservasDTO reservasDTO);
 
     List<ServiciosDTO> getServiciosContratados(List<String> nombres);

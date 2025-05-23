@@ -47,6 +47,16 @@ public class ReservasController {
         }
     }
 
+    @PutMapping("/updateEstado")
+    public ResponseEntity<ReservasDTO> updateEstado(@RequestBody ReservasDTO reservasDTO) {
+        try {
+            return ResponseEntity.ok(reservasService.updateEstadosReservas(reservasDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<ReservasDTO> save(@RequestBody ReservasDTO reservasDTO) {
         try {

@@ -1,6 +1,8 @@
 package com.fct.backfct.web;
 
+import com.fct.backfct.domain.dto.FiltroBusquedaDTO;
 import com.fct.backfct.domain.dto.HabitacionesDTO;
+import com.fct.backfct.domain.models.entity.Habitaciones;
 import com.fct.backfct.domain.models.entity.Incidencias;
 import com.fct.backfct.domain.services.Habitaciones.IHabitacionesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,29 @@ public class HabitacionesController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+
+
+    @PostMapping("/buscar")
+    public ResponseEntity<?> buscarHabitaciones(@RequestBody FiltroBusquedaDTO filtro) {
+        List<Habitaciones> resultados;
+
+        switch (filtro.getTipoBusqueda()) {
+            case "habitacion":
+                resultados = habitacionesService.buscarPorFiltrosHabitacion(filtro);
+                break;
+            case "cliente":
+                resultados = habitacionesService.buscarPorFiltrosCliente(filtro);
+                break;
+            case "reserva":
+                resultados = habitacionesService.buscarPorFiltrosReserva(filtro);
+                break;
+            default:
+                return ResponseEntity.badRequest().body("Tipo de búsqueda no válido");
+        }
+
+        return ResponseEntity.ok(resultados);
     }
 
 }

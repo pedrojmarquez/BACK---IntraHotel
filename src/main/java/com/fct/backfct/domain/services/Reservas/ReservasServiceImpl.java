@@ -2,14 +2,8 @@ package com.fct.backfct.domain.services.Reservas;
 
 import com.fct.backfct.domain.converters.*;
 import com.fct.backfct.domain.dto.*;
-import com.fct.backfct.domain.models.dao.IEstadoReservaDao;
-import com.fct.backfct.domain.models.dao.IReservasDao;
-import com.fct.backfct.domain.models.dao.IReservasServiciosDao;
-import com.fct.backfct.domain.models.dao.IServiciosDao;
-import com.fct.backfct.domain.models.entity.Clientes;
-import com.fct.backfct.domain.models.entity.Facturas;
-import com.fct.backfct.domain.models.entity.Reservas;
-import com.fct.backfct.domain.models.entity.ReservasServicios;
+import com.fct.backfct.domain.models.dao.*;
+import com.fct.backfct.domain.models.entity.*;
 import com.fct.backfct.domain.services.EmailService;
 import com.fct.backfct.domain.services.Facturas.FacturasServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +52,12 @@ public class ReservasServiceImpl implements IReservasService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private IHabitacionesDao habitacionesDao;
+
+    @Autowired
+    private IEstadosHabitacionDao estadosHabitacionDao;
+
     @Override
     public List<ReservasDTO> findAll() {
         return reservasMapper.toListDtos(reservasDao.getReservasOrdenadasPorFecha());
@@ -71,6 +71,19 @@ public class ReservasServiceImpl implements IReservasService {
     @Override
     public ReservasDTO update(ReservasDTO reservasDTO) {
         return reservasMapper.toDto(reservasDao.save(reservasMapper.toEntity(reservasDTO)));
+    }
+
+    @Override
+    public ReservasDTO updateEstadosReservas(ReservasDTO reservasDTO) {
+        Reservas reserva = reservasMapper.toEntity(reservasDTO);
+        Habitaciones habitacion = reserva.getHabitacion();
+        if(reserva.getEstadoReserva().getIdEstadoReserva() == 2L){
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(2L).orElse(null));
+            habitacionesDao.save(habitacion);
+            log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a confirmada");
+        }
+
+        return reservasMapper.toDto(reservasDao.save(reserva));
     }
 
     @Override
@@ -110,8 +123,14 @@ public class ReservasServiceImpl implements IReservasService {
             reserva.setIdfactura(facturaGuardada.getIdFactura());
 
             reservasDao.save(reserva);
+            log.info("Reserva " + reserva.getIdReserva() + " guardada con factura " + facturaGuardada.getIdFactura());
+            Habitaciones habitacion = reserva.getHabitacion();
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(1L).orElse(null));
+            habitacionesDao.save(habitacion);
+            log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a disponible");
 
             enviarFactura(reserva.getCliente(),facturaGuardada.getRutaFichero());
+            log.info("Factura enviada a " + reserva.getCliente().getEmail());
 
             return facturaDTO;
         }catch (Exception e) {
