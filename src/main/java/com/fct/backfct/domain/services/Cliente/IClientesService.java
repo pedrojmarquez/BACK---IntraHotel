@@ -1,6 +1,7 @@
 package com.fct.backfct.domain.services.Cliente;
 
 import com.fct.backfct.domain.dto.ClientesDTO;
+import com.fct.backfct.domain.dto.ReservasDTO;
 
 import java.util.List;
 
@@ -11,4 +12,9 @@ public interface IClientesService {
     ClientesDTO save(ClientesDTO dto);
     ClientesDTO update(ClientesDTO dto);
 
+    List<ClientesDTO> findByHabitacionId(Long idHabitacion);
+
+    ClientesDTO delete(ClientesDTO clientesDTO);
+
+    ClientesDTO findByDni(String dni);
 }

@@ -3,6 +3,7 @@ package com.fct.backfct.domain.services.Habitaciones;
 import com.fct.backfct.domain.dto.FiltroBusquedaDTO;
 import com.fct.backfct.domain.dto.HabitacionesDTO;
 import com.fct.backfct.domain.dto.IncidenciasDTO;
+import com.fct.backfct.domain.dto.LogsLimpiezaDTO;
 import com.fct.backfct.domain.models.entity.Habitaciones;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,12 +20,15 @@ public interface IHabitacionesService {
 
     List<HabitacionesDTO> findAllLimpieza(Integer planta);
 
-    List<HabitacionesDTO> limpiar(List<HabitacionesDTO> habitacionesDTO);
+    List<HabitacionesDTO> limpiar(HttpServletRequest request,List<HabitacionesDTO> habitacionesDTO);
 
     IncidenciasDTO crearIncidencia(HttpServletRequest request, Long idHabitacion, String observaciones, List<MultipartFile> imagenes);
 
     List<Habitaciones> buscarPorFiltrosHabitacion(FiltroBusquedaDTO filtro);
-
     List<Habitaciones> buscarPorFiltrosCliente(FiltroBusquedaDTO filtro);
     List<Habitaciones> buscarPorFiltrosReserva(FiltroBusquedaDTO filtro);
+
+    HabitacionesDTO findById(Long idHabitacion);
+
+    LogsLimpiezaDTO saveLogsLimpieza(HttpServletRequest request,LogsLimpiezaDTO logsLimpiezaDTO);
 }

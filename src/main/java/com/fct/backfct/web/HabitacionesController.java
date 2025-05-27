@@ -2,6 +2,7 @@ package com.fct.backfct.web;
 
 import com.fct.backfct.domain.dto.FiltroBusquedaDTO;
 import com.fct.backfct.domain.dto.HabitacionesDTO;
+import com.fct.backfct.domain.dto.LogsLimpiezaDTO;
 import com.fct.backfct.domain.models.entity.Habitaciones;
 import com.fct.backfct.domain.models.entity.Incidencias;
 import com.fct.backfct.domain.services.Habitaciones.IHabitacionesService;
@@ -49,14 +50,24 @@ public class HabitacionesController {
     }
 
     @PostMapping("/limpiar")
-    public ResponseEntity<List<HabitacionesDTO>> limpiar(@RequestBody List<HabitacionesDTO> habitacionesDTO) {
+    public ResponseEntity<List<HabitacionesDTO>> limpiar(HttpServletRequest request,@RequestBody List<HabitacionesDTO> habitacionesDTO) {
         try {
-            return ResponseEntity.ok(habitacionesService.limpiar(habitacionesDTO));
+            return ResponseEntity.ok(habitacionesService.limpiar(request,habitacionesDTO));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
+    }
+
+    @PostMapping("/limpieza-diaria/{idHabitacion}")
+    public ResponseEntity<LogsLimpiezaDTO> limpiezaDiaria(HttpServletRequest request,@PathVariable Long idHabitacion , @RequestBody LogsLimpiezaDTO logsLimpiezaDTO) {
+        try {
+            return ResponseEntity.ok(habitacionesService.saveLogsLimpieza(request,logsLimpiezaDTO));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/{idHabitacion}/incidencias")
@@ -95,6 +106,16 @@ public class HabitacionesController {
         }
 
         return ResponseEntity.ok(resultados);
+    }
+
+    @GetMapping("/{idHabitacion}")
+    public ResponseEntity<HabitacionesDTO> findById(@PathVariable Long idHabitacion) {
+        try {
+            return ResponseEntity.ok(habitacionesService.findById(idHabitacion));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

@@ -13,7 +13,9 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -79,6 +81,7 @@ public class ReservasServiceImpl implements IReservasService {
         Habitaciones habitacion = reserva.getHabitacion();
         if(reserva.getEstadoReserva().getIdEstadoReserva() == 2L){
             habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(2L).orElse(null));
+            habitacion.setLimpiezaDiaria(0);
             habitacionesDao.save(habitacion);
             log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a confirmada");
         }
@@ -106,8 +109,8 @@ public class ReservasServiceImpl implements IReservasService {
             factura.setReserva(reserva);
             factura.setCliente(reserva.getCliente());
             factura.setSubtotal(reserva.getPrecioTotal());
-            factura.setIva(reserva.getPrecioTotal() * 0.1);
-            factura.setTotal(factura.getSubtotal() + factura.getIva());
+            factura.setIva(reserva.getPrecioTotal() - reserva.getPrecioTotal() / 1.10);
+            factura.setTotal(factura.getSubtotal());
             factura.setMetodoPago(facturasService.getMetodoPago(metodoPago));
 
             factura.setRutaFichero(facturasService.generarFacturaPDF(factura));
@@ -125,7 +128,7 @@ public class ReservasServiceImpl implements IReservasService {
             reservasDao.save(reserva);
             log.info("Reserva " + reserva.getIdReserva() + " guardada con factura " + facturaGuardada.getIdFactura());
             Habitaciones habitacion = reserva.getHabitacion();
-            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(1L).orElse(null));
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(3L).orElse(null));
             habitacionesDao.save(habitacion);
             log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a disponible");
 
@@ -160,4 +163,30 @@ public class ReservasServiceImpl implements IReservasService {
         List<ReservasServicios> serviciosContratados = reservasServiciosMapper.toListEntities(serviciosContratadosDto);
         return reservasServiciosMapper.toListDtos(reservasServiciosDao.saveAll(serviciosContratados));
     }
+
+    @Override
+    public List<ReservasDTO> findByHabitacionId(Long idHabitacion) {
+        return reservasMapper.toListDtos(reservasDao.findTop5ByHabitacion_IdHabitacionOrderByFechaReservaDesc(idHabitacion));
+    }
+
+    @Override
+    public List<ReservasDTO> findReservasByClienteId(Long id) {
+
+        return reservasMapper.toListDtos(reservasDao.findTop3ByCliente_IdClienteOrderByFechaReservaDesc(id));
+    }
+
+    @Override
+    public Optional<LocalDateTime> obtenerFechaLimiteParaAmpliar(Long habitacionId, LocalDateTime fechaSalidaActual) {
+        List<Reservas> siguientes = reservasDao.findSiguientesReservas(habitacionId, fechaSalidaActual);
+        if (!siguientes.isEmpty()) {
+            return Optional.of(siguientes.get(0).getFechaEntrada());
+        }
+        return Optional.empty(); // No hay más reservas, puede ampliar libremente
+    }
+
+    @Override
+    public List<ReservaServicioDTO> findServiciosByReservaId(Long idReserva) {
+        return reservasServiciosMapper.toListDtos(reservasServiciosDao.findByReserva_IdReserva(idReserva));
+    }
+
 }

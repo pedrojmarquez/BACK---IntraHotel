@@ -2,11 +2,13 @@ package com.fct.backfct.domain.models.dao;
 
 import com.fct.backfct.domain.models.entity.Habitaciones;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
@@ -31,11 +33,17 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
 
     @Query("""
     SELECT h FROM Habitaciones h
-    WHERE h.estadoHabitacion.idEstado IN (3, 5)
+    WHERE
+      (
+        h.estadoHabitacion.idEstado = 3 OR
+        (h.estadoHabitacion.idEstado = 2 AND h.limpiezaDiaria = 1)
+      )
     AND (:planta IS NULL OR h.planta = :planta)
     ORDER BY h.numeroHabitacion
 """)
     List<Habitaciones> findHabitacionesLimpieza(@Param("planta") Integer planta);
+
+
 
 
     // Búsqueda para tipoBusqueda = "habitacion"
@@ -55,22 +63,49 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
             @Param("tipo") String tipo,
             @Param("planta") Integer planta);
 
+
+
+
     // Búsqueda para tipoBusqueda = "cliente"
-    @Query("SELECT h FROM Habitaciones h JOIN Reservas r JOIN r.cliente c WHERE " +
-            "(:nombreCliente IS NULL OR c.nombre LIKE %:nombreCliente%) AND " +
-            "(:dniCliente IS NULL OR c.dni = :dniCliente)")
+    @Query("SELECT r.habitacion " +
+            "FROM Reservas r " +
+            "JOIN r.cliente c " +
+            "WHERE r.estadoReserva.idEstadoReserva in(1, 2) " +
+            "AND (:nombreCliente IS NULL OR LOWER(c.nombre) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
+            "AND (:dniCliente IS NULL OR c.dni = :dniCliente) " +
+            "AND (:apellidos IS NULL OR LOWER(c.apellidos) LIKE LOWER(CONCAT('%', :apellidos, '%'))) " +
+            "AND (:telefono IS NULL OR c.telefono = :telefono)")
     List<Habitaciones> buscarPorFiltrosCliente(
             @Param("nombreCliente") String nombreCliente,
-            @Param("dniCliente") String dniCliente);
+            @Param("dniCliente") String dniCliente,
+            @Param("apellidos") String apellidos,
+            @Param("telefono") String telefono);
+
+
+
+
 
     // Búsqueda para tipoBusqueda = "reserva"
-    @Query("SELECT h FROM Habitaciones h JOIN Reservas r WHERE " +
-            "(:fechaEntrada IS NULL OR r.fechaEntrada = :fechaEntrada) AND " +
-            "(:fechaSalida IS NULL OR r.fechaSalida = :fechaSalida) AND " +
-            "(:estadoReserva IS NULL OR r.estadoReserva = :estadoReserva)")
+    @Query("""
+    SELECT r.habitacion
+    FROM Reservas r
+    WHERE (:fechaEntrada IS NULL OR FUNCTION('DATE', r.fechaEntrada) = :fechaEntrada)
+    AND (:fechaSalida IS NULL OR FUNCTION('DATE', r.fechaSalida) = :fechaSalida)
+    AND (:fechaReserva IS NULL OR FUNCTION('DATE', r.fechaReserva) = :fechaReserva)
+    AND (:estadoReserva IS NULL OR r.estadoReserva.idEstadoReserva = :estadoReserva)
+""")
     List<Habitaciones> buscarPorFiltrosReserva(
-            @Param("fechaEntrada") LocalDate fechaEntrada,
-            @Param("fechaSalida") LocalDate fechaSalida,
-            @Param("estadoReserva") String estadoReserva);
+            @Param("fechaEntrada") Date fechaEntrada,
+            @Param("fechaSalida") Date fechaSalida,
+            @Param("fechaReserva") Date fechaReserva,
+            @Param("estadoReserva") Long estadoReserva);
+
+
+
+    // Metodo para proceso automatico de limpieza diaria
+    @Modifying
+    @Query("UPDATE Habitaciones h SET h.limpiezaDiaria = 1 WHERE h.estadoHabitacion.idEstado = 2")
+    void actualizarLimpiezaDiariaParaOcupadas();
+
 
 }

@@ -3,7 +3,9 @@ package com.fct.backfct.domain.services.Reservas;
 import com.fct.backfct.domain.dto.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface IReservasService {
 
@@ -23,4 +25,11 @@ public interface IReservasService {
 
     List<ReservaServicioDTO> saveServiciosContratados(List<ReservaServicioDTO> serviciosContratadosDto);
 
+    List<ReservasDTO> findByHabitacionId(Long idHabitacion);
+
+    List<ReservasDTO> findReservasByClienteId(Long id);
+
+    Optional<LocalDateTime> obtenerFechaLimiteParaAmpliar(Long habitacionId, LocalDateTime fechaSalidaActual);
+
+    List<ReservaServicioDTO> findServiciosByReservaId(Long idReserva);
 }

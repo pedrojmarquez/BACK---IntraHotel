@@ -2,6 +2,8 @@ package com.fct.backfct.domain.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -17,4 +19,9 @@ public class HabitacionesDTO {
     private String descripcion;
     private Integer capacidad;
     private EstadosHabitacionDTO estadoHabitacion;
+    private EmpleadosDTO limpiadoPor;
+    private LocalDateTime limpiado;
+    private EmpleadosDTO mantenidoPor;
+    private LocalDateTime mantenido;
+    private Integer limpiezaDiaria;
 }

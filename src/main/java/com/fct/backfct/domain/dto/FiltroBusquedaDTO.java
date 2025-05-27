@@ -3,6 +3,10 @@ package com.fct.backfct.domain.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Builder
 @Getter
 @Setter
@@ -15,4 +19,12 @@ public class FiltroBusquedaDTO {
     private String tipo;
     private String tipoBusqueda;
     private Integer planta;
+    private String nombre;
+    private String apellidos;
+    private String telefono;
+    private String dni;
+    private Date fechaEntrada;
+    private Date fechaSalida;
+    private Date fechaReserva;
+    private Long estadoReserva;
 }

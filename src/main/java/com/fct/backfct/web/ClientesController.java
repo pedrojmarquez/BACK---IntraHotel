@@ -1,6 +1,7 @@
 package com.fct.backfct.web;
 
 import com.fct.backfct.domain.dto.ClientesDTO;
+import com.fct.backfct.domain.dto.ReservasDTO;
 import com.fct.backfct.domain.services.Cliente.IClientesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,14 @@ public class ClientesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();        }
     }
 
+    @PutMapping("/delete")
+    public ResponseEntity<ClientesDTO> delete(HttpServletRequest request,@RequestBody ClientesDTO clientesDTO) {
+        try {
+            return ResponseEntity.ok(clientesService.delete(clientesDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<ClientesDTO> save(HttpServletRequest request,@RequestBody ClientesDTO clientesDTO) {
         try {
@@ -49,5 +58,23 @@ public class ClientesController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();        }
     }
+
+    @GetMapping("/habitacion/{idHabitacion}")
+    public ResponseEntity<List<ClientesDTO>> findByHabitacion(@PathVariable Long idHabitacion) {
+        try {
+            return ResponseEntity.ok(clientesService.findByHabitacionId(idHabitacion));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();        }
+    }
+
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<ClientesDTO> findByDni(@PathVariable String dni) {
+        try {
+            return ResponseEntity.ok(clientesService.findByDni(dni));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();        }
+    }
+
+
 
 }

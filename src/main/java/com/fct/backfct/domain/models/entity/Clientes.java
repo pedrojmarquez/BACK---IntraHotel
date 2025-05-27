@@ -42,9 +42,13 @@ public class Clientes implements Serializable {
     @Column(name = "fecha_registro")
     private Date fechaRegistro;
 
+    private boolean activo = true;
+
+
     @PrePersist
     public void prePersist() {
         fechaRegistro = new Date();
+        activo = true;
     }
 
 }
