@@ -18,5 +18,6 @@ public class IncidenciasDTO {
     private String descripcion;
     private Date fechaReporte;
     private EstadosIncidenciaDTO estado;
+    private String descripcionArreglo;
     List<ImagenesIncidenciaDTO> imagenes;
 }

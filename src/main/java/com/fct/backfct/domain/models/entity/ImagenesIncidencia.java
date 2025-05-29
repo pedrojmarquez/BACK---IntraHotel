@@ -23,6 +23,8 @@ public class ImagenesIncidencia implements Serializable {
     @JoinColumn(name = "id_incidencia",referencedColumnName = "id_incidencia")
     private Incidencias incidencia;
 
+    private String tipo;
+
     @Column(name = "ruta_imagen")
     private String rutaImagen;
 }

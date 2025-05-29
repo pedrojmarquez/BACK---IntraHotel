@@ -18,6 +18,6 @@ public class ReservasDTO {
     private LocalDateTime fechaReserva;
     private Double precioTotal;
     private ClientesDTO cliente;
-    private HabitacionesSinEstadoDTO habitacion;
+    private HabitacionesDTO habitacion;
     private EstadosReservaDTO estadosReserva;
 }

@@ -79,5 +79,38 @@ public class EmailService {
         mailSender.send(mensaje);
     }
 
+    public void enviarCorreoMantenimiento(String to, String asunto, String plantilla, Context contexto, Long idHabitacion) throws MessagingException, IOException {
+        MimeMessage mensaje = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
+
+        helper.setTo(to);
+        helper.setSubject(asunto);
+
+        // Procesar plantilla HTML con Thymeleaf
+        String htmlContent = templateEngine.process(plantilla, contexto);
+        helper.setText(htmlContent, true);
+
+        // Obtener ruta absoluta al directorio del proyecto
+        String rutaBaseProyecto = new File(".").getCanonicalPath();
+        String carpetaPath = rutaBaseProyecto + File.separator + "uploads" + File.separator + "mantenimiento" + File.separator + idHabitacion;
+
+        File carpeta = new File(carpetaPath);
+
+        if (carpeta.exists() && carpeta.isDirectory()) {
+            File[] archivos = carpeta.listFiles();
+            if (archivos != null) {
+                for (File archivo : archivos) {
+                    if (archivo.isFile()) {
+                        FileSystemResource file = new FileSystemResource(archivo);
+                        helper.addAttachment(archivo.getName(), file);
+                    }
+                }
+            }
+        }
+
+        mailSender.send(mensaje);
+    }
+
+
 
 }

@@ -81,9 +81,35 @@ public class ReservasServiceImpl implements IReservasService {
         Habitaciones habitacion = reserva.getHabitacion();
         if(reserva.getEstadoReserva().getIdEstadoReserva() == 2L){
             habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(2L).orElse(null));
-            habitacion.setLimpiezaDiaria(0);
+            habitacion.setLimpiezaDiaria(1);
             habitacionesDao.save(habitacion);
             log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a confirmada");
+        }
+
+        if(reserva.getEstadoReserva().getIdEstadoReserva() == 3L){
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(1L).orElse(null));
+            habitacion.setLimpiezaDiaria(0);
+            habitacionesDao.save(habitacion);
+            log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a cancelada");
+        }
+        if (reserva.getEstadoReserva().getIdEstadoReserva() == 1L) {
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(1L).orElse(null));
+            habitacion.setLimpiezaDiaria(0);
+            habitacionesDao.save(habitacion);
+            log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a pendiente");
+        }
+        if (reserva.getEstadoReserva().getIdEstadoReserva() == 4L) {
+            if(habitacion.getEstadoHabitacion().getIdEstado() == 5L){
+                habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(4L).orElse(null));
+                habitacion.setLimpiezaDiaria(0);
+                habitacionesDao.save(habitacion);
+                log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a mantenimiento");
+            }else{
+                habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(3L).orElse(null));
+                habitacion.setLimpiezaDiaria(0);
+                habitacionesDao.save(habitacion);
+                log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a limpieza");
+            }
         }
 
         return reservasMapper.toDto(reservasDao.save(reserva));
@@ -128,9 +154,22 @@ public class ReservasServiceImpl implements IReservasService {
             reservasDao.save(reserva);
             log.info("Reserva " + reserva.getIdReserva() + " guardada con factura " + facturaGuardada.getIdFactura());
             Habitaciones habitacion = reserva.getHabitacion();
-            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(3L).orElse(null));
-            habitacionesDao.save(habitacion);
-            log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a disponible");
+
+            //comprobamos que la la habitacion no tiene incidencias
+            if(habitacion.getEstadoHabitacion().getIdEstado() == 5L){
+                habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(4L).orElse(null));
+                habitacion.setLimpiezaDiaria(0);
+                habitacionesDao.save(habitacion);
+                log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a mantenimiento");
+            }else{
+                habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(3L).orElse(null));
+                habitacion.setLimpiezaDiaria(0);
+                habitacionesDao.save(habitacion);
+                log.info("Habitacion " + habitacion.getIdHabitacion() + " cambia estado a limpieza");
+            }
+
+
+
 
             enviarFactura(reserva.getCliente(),facturaGuardada.getRutaFichero());
             log.info("Factura enviada a " + reserva.getCliente().getEmail());

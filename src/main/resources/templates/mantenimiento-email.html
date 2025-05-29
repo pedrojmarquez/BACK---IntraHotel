@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Incidencia resuelta</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            color: #333;
+        }
+
+        .card {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #198754;
+            margin-top: 0;
+        }
+
+        .info {
+            margin: 20px 0;
+        }
+
+        .info p {
+            margin: 8px 0;
+        }
+
+        .highlight {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 6px;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>✅ Mantenimiento realizado con éxito</h2>
+
+    <p>Se ha registrado la resolución de una incidencia en la siguiente habitación:</p>
+
+    <div class="info">
+        <p><strong>Habitación:</strong> <span th:text="${numeroHabitacion}"></span></p>
+        <p><strong>Fecha del arreglo:</strong> <span th:text="${fechaArreglo}"></span></p>
+        <p><strong>Responsable del mantenimiento:</strong> <span th:text="${MantenidoPor}"></span></p>
+    </div>
+
+    <p><strong>Descripción del arreglo:</strong></p>
+    <div class="highlight">
+        <span th:text="${observacionesArreglo}">Sin observaciones</span>
+    </div>
+
+    <p>Gracias por mantener en óptimas condiciones nuestras instalaciones.</p>
+
+    <div class="footer">
+        Este correo ha sido enviado automáticamente por el sistema de gestión del hotel.
+    </div>
+</div>
+</body>
+</html>

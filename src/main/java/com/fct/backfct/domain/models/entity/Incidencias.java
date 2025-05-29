@@ -38,6 +38,9 @@ public class Incidencias implements Serializable {
     @Column(name = "id_estado_incidencia")
     private Long idEstadoIncidencia;
 
+    @Column(name = "descripcion_arreglo")
+    private String descripcionArreglo;
+
     @PrePersist
     public void prePersist() {
         this.fechaReporte = new Date();

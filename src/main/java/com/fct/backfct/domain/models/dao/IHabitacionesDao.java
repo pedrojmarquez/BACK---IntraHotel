@@ -19,6 +19,7 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
         SELECT r.habitacion.idHabitacion FROM Reservas r
         WHERE r.fechaEntrada < :fechaSalida
           AND r.fechaSalida > :fechaEntrada
+          AND r.estadoReserva.idEstadoReserva = 1
     )
     AND (:tipo IS NULL OR h.tipo = :tipo)
     AND (:capacidad IS NULL OR h.capacidad = :capacidad)
@@ -36,13 +37,24 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
     WHERE
       (
         h.estadoHabitacion.idEstado = 3 OR
-        (h.estadoHabitacion.idEstado = 2 AND h.limpiezaDiaria = 1)
+        (h.estadoHabitacion.idEstado IN (2,5) AND h.limpiezaDiaria = 1)
       )
     AND (:planta IS NULL OR h.planta = :planta)
     ORDER BY h.numeroHabitacion
 """)
     List<Habitaciones> findHabitacionesLimpieza(@Param("planta") Integer planta);
 
+    // Metodo para obtener todas las habitaciones para hacerle el mantenimiento
+    @Query("""
+    SELECT h FROM Habitaciones h
+    WHERE h.estadoHabitacion.idEstado = 4
+    AND EXISTS (
+        SELECT i FROM Incidencias i
+        WHERE i.idHabitacion = h.idHabitacion AND i.idEstadoIncidencia = 3
+    )
+    AND (:planta IS NULL OR h.planta = :planta)
+""")
+    List<Habitaciones> findHabitacionesMantenimiento(@Param("planta") Integer planta);
 
 
 
@@ -106,6 +118,8 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
     @Modifying
     @Query("UPDATE Habitaciones h SET h.limpiezaDiaria = 1 WHERE h.estadoHabitacion.idEstado = 2")
     void actualizarLimpiezaDiariaParaOcupadas();
+
+
 
 
 }

@@ -10,5 +10,6 @@ import lombok.*;
 public class ImagenesIncidenciaDTO {
     private Long idImagen;
     private IncidenciasDTO incidencia;
+    private String tipo;
     private String rutaImagen;
 }

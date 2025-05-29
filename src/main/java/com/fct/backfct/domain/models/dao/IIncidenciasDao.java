@@ -11,4 +11,6 @@ public interface IIncidenciasDao extends JpaRepository<Incidencias, Long> {
 
     @Query("SELECT i FROM Incidencias i WHERE i.idEstadoIncidencia = :estadoIncidencia")
     List<Incidencias> findIncidenciasPendienteNotificacion(@Param("estadoIncidencia") Long estadoIncidencia);
+
+    List<Incidencias> findByIdHabitacion(Long idHabitacion);
 }

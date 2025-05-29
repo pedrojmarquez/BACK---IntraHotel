@@ -1,9 +1,6 @@
 package com.fct.backfct.domain.services.Habitaciones;
 
-import com.fct.backfct.domain.converters.EstadosIncidenciaMapper;
-import com.fct.backfct.domain.converters.HabitacionesMapper;
-import com.fct.backfct.domain.converters.ImagenesIncidenciaMapper;
-import com.fct.backfct.domain.converters.LogsLimpiezaMapper;
+import com.fct.backfct.domain.converters.*;
 import com.fct.backfct.domain.dto.*;
 import com.fct.backfct.domain.models.dao.*;
 import com.fct.backfct.domain.models.entity.*;
@@ -14,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 
@@ -26,15 +24,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@Transactional
 @Service
 public class HabitacionesServiceImpl implements IHabitacionesService {
 
@@ -52,6 +54,9 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
     @Autowired
     private IIncidenciasDao incidenciasDao;
+
+    @Autowired
+    private IncidenciasMapper IncidenciasMapper;
 
     @Autowired
     private IImagenesIncidenciaDao imagenesIncidenciaDao;
@@ -76,9 +81,8 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
     @Autowired
     private LogsLimpiezaMapper logsLimpiezaMapper;
-
-
-
+    @Autowired
+    private IncidenciasMapper incidenciasMapper;
 
 
     @Override
@@ -100,6 +104,12 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
     @Override
     public List<HabitacionesDTO> findAllLimpieza(Integer planta) {
         List<Habitaciones> habitaciones =  habitacionesDao.findHabitacionesLimpieza(planta);
+        return habitacionesMapper.toListDtos(habitaciones);
+    }
+
+    @Override
+    public List<HabitacionesDTO> findAllParaMantenimiento(Integer planta) {
+        List<Habitaciones> habitaciones =  habitacionesDao.findHabitacionesMantenimiento(planta);
         return habitacionesMapper.toListDtos(habitaciones);
     }
 
@@ -140,6 +150,7 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
         return logsLimpiezaMapper.toDto(logsLimpieza);
     }
 
+
     @Scheduled(cron = "0 0 6,14 * * *") // A las 06:00 y 14:00 cada día
     public void marcarLimpiezaDiariaParaOcupadas() {
         log.info("Marcando limpieza diaria para habitaciones ocupadas");
@@ -160,24 +171,26 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
         incidencia.setIdEstadoIncidencia(1L);
         incidencia = incidenciasDao.save(incidencia);
 
+        // 2. Actualizar el estado de la habitación
         Habitaciones habitacion = habitacionesDao.findById(idHabitacion).orElse(null);
         if(habitacion.getEstadoHabitacion().getIdEstado() == 3L){
-            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(5L).orElse(null));
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(4L).orElse(null));
             habitacionesDao.save(habitacion);
         }else{
-            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(4L).orElse(null));
+            habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(5L).orElse(null));
             habitacionesDao.save(habitacion);
         }
 
         List<ImagenesIncidencia> imagenesIncidencia= new java.util.ArrayList<>(List.of());
 
 
-        // 2. Guardar las imágenes relacionadas
+        // 3. Guardar las imágenes relacionadas
         for (MultipartFile imagen : imagenes) {
             if (!imagen.isEmpty()) {
-                String ruta = guardarImagen(imagen, idHabitacion); // Implementas esta función
+                String ruta = guardarImagen(imagen, idHabitacion,"incidencias"); // Implementas esta función
                 ImagenesIncidencia imagenEntidad = new ImagenesIncidencia();
                 imagenEntidad.setIncidencia(incidencia);
+                imagenEntidad.setTipo("incidencia");
                 imagenEntidad.setRutaImagen(ruta);
                 imagenesIncidencia.add(imagenesIncidenciaDao.save(imagenEntidad));
             }
@@ -192,46 +205,49 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
         incidenciaDTO.setEstado(estadosIncidenciaMapper.toDto( estadosIncidenciaDao.findById(incidencia.getIdEstadoIncidencia()).orElse(null)));
         incidenciaDTO.setImagenes(imagenesIncidenciaMapper.toListDtos(imagenesIncidencia));
 
-//         3. Notificar la incidencia con imajenes adjuntas por correo
-//        try {
-//            Context context = new Context();
-//            context.setVariable("numeroHabitacion", habitacion.getNumeroHabitacion());
-//            //fecha en formto dd/MM/yyyy
-//            context.setVariable("fecha", incidencia.getFechaReporte().getDate()+"/"+incidencia.getFechaReporte().getMonth()+"/"+incidencia.getFechaReporte().getYear());
-//            context.setVariable("reportadoPor", jwtProvider.getUserFromToken(request).getNombre()+" "+jwtProvider.getUserFromToken(request).getApellidos());
-//            context.setVariable("observaciones", incidenciaDTO.getDescripcion());
-//
-//            Thread.sleep(20000);
-//            this.notificarIncidencia(context, habitacion);
-//        } catch (MessagingException e) {
-//            throw new RuntimeException(e);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
 
         return incidenciaDTO;
     }
 
+    @Override
+    public IncidenciasDTO hacerMantenimiento(HttpServletRequest request,Long idIncidencia, Long idHabitacion, String observaciones, List<MultipartFile> imagenes) {
 
-    private void notificarIncidencia(Context context, Habitaciones habitacion) throws MessagingException {
-        try{
-            emailService.enviarCorreoIncidencia(
-                    "intrahotel.soporte@gmail.com",
-                    "Incidencia en Habitacion " + habitacion.getNumeroHabitacion(),
-                    "incidencia-email",
-                    context,
-                    habitacion.getIdHabitacion()
-            );
-        }catch (IOException e) {
-            throw new RuntimeException(e);
+        Incidencias incidencia = incidenciasDao.findById(idIncidencia).orElse(null);
+        Habitaciones habitacion = habitacionesDao.findById(idHabitacion).orElse(null);
+
+        // 2. Actualizar el estado de la habitación
+        habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(3L).orElse(null));
+        habitacion.setMantenidoPor(jwtProvider.getUserFromToken(request));
+        habitacion.setMantenido(LocalDateTime.now());
+        habitacionesDao.save(habitacion);
+
+        List<ImagenesIncidencia> imagenesIncidencia= new java.util.ArrayList<>(List.of());
+        // 3. Guardar las imágenes relacionadas
+        for (MultipartFile imagen : imagenes) {
+            if (!imagen.isEmpty()) {
+                String ruta = guardarImagen(imagen, idHabitacion,"mantenimiento");
+                ImagenesIncidencia imagenEntidad = new ImagenesIncidencia();
+                imagenEntidad.setIncidencia(incidencia);
+                imagenEntidad.setTipo("mantenimiento");
+                imagenEntidad.setRutaImagen(ruta);
+                imagenesIncidencia.add(imagenesIncidenciaDao.save(imagenEntidad));
+            }
         }
 
+
+        incidencia.setIdEstadoIncidencia(4L);
+        incidencia.setDescripcionArreglo(observaciones);
+
+
+        return incidenciasMapper.toDto(incidenciasDao.save(incidencia));
     }
+
+
 
     @Scheduled(fixedRate = 150000) // Cada 10 minutos (600,000 ms)
     public void procesarIncidenciasPendientes() {
         List<Incidencias> pendientes = incidenciasDao.findIncidenciasPendienteNotificacion(1L); // estado 1 = pendiente
+        List<Incidencias> tramitando = incidenciasDao.findIncidenciasPendienteNotificacion(4L); // estado 2 = tramitando
 
         log.info("Procesando " + pendientes.size() + " incidencias pendientes");
 
@@ -248,7 +264,7 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
                 Context context = new Context();
                 context.setVariable("numeroHabitacion", habitacion.getNumeroHabitacion());
-                context.setVariable("fecha", incidencia.getFechaReporte().getDay()+"/"+incidencia.getFechaReporte().getMonth()+"/"+incidencia.getFechaReporte().getYear());
+                context.setVariable("fecha", new SimpleDateFormat("dd/MM/yyyy").format(incidencia.getFechaReporte()));
                 context.setVariable("reportadoPor", empleado.getNombre()+" "+empleado.getApellidos());
                 context.setVariable("observaciones", incidencia.getDescripcion());
 
@@ -270,33 +286,115 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
                 e.printStackTrace();
             }
         }
+
+
+        log.info("Procesando " + tramitando.size() + " mantenimientos realizados pendientes");
+
+        // Notificar mantenimiento realizado
+        for (Incidencias incidencia : tramitando) {
+            try {
+                // Cambiar estado a procesando
+                incidencia.setIdEstadoIncidencia(5L);
+                incidenciasDao.save(incidencia);
+
+                log.info("Notificando mantenimiento de la incidencia " + incidencia.getIdIncidencia());
+
+                Habitaciones habitacion = habitacionesDao.findById(incidencia.getIdHabitacion()).orElse(null);
+
+                Context context = new Context();
+                context.setVariable("numeroHabitacion", habitacion.getNumeroHabitacion());
+                context.setVariable("fechaArreglo", habitacion.getMantenido().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                context.setVariable("MantenidoPor", habitacion.getMantenidoPor().getNombre()+" "+habitacion.getMantenidoPor().getApellidos());
+                context.setVariable("observacionesArreglo", incidencia.getDescripcionArreglo());
+
+                String to = "intrahotel.soporte@gmail.com";
+                String subject = "Mantenimiento en Habitacion " + habitacion.getNumeroHabitacion();
+                String template = "mantenimiento-email";
+
+                emailService.enviarCorreoMantenimiento(to, subject, template, context, habitacion.getIdHabitacion());
+
+                log.info("Mantenimiento de la incidencia " + incidencia.getIdIncidencia() + " notificada");
+
+                // Cambiar estado a enviado
+                incidencia.setIdEstadoIncidencia(6L);
+                incidenciasDao.save(incidencia);
+
+            } catch (Exception e) {
+                // Si algo falla, lo dejamos en estado 5 para intentar luego o marcar con otro estado de error si lo prefieres
+                log.error("Error al notificar incidencia " + incidencia.getIdIncidencia(), e);
+                e.printStackTrace();
+            }
+        }
     }
 
 
-    public String guardarImagen(MultipartFile archivo, Long idHabitacion) {
+    public String guardarImagen(MultipartFile archivo, Long idHabitacion, String accion) {
         try {
             // Obtener la ruta del directorio del proyecto
-            String rutaBaseProyecto = new File(".").getCanonicalPath(); // O getAbsolutePath() con ajustes
-            String rutaBase = rutaBaseProyecto + File.separator + "uploads" + File.separator + "incidencias" + File.separator + idHabitacion;
+            String rutaBaseProyecto = new File(".").getCanonicalPath();
+            String rutaBase = rutaBaseProyecto + File.separator + "uploads" + File.separator + accion + File.separator + idHabitacion;
 
-            // Crear carpeta si no existe
+            // Crear el directorio si no existe
             File dir = new File(rutaBase);
-            if (!dir.exists()) dir.mkdirs();
+            if (!dir.exists()) {
+                dir.mkdirs();
+            } else {
+                // Si ya existe, eliminar todos los archivos existentes en esa carpeta
+                for (File file : dir.listFiles()) {
+                    if (file.isFile()) {
+                        file.delete();
+                    }
+                }
+            }
 
-            // Nombre del archivo
+            // Crear nombre único para el archivo
             String nombreArchivo = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
             Path rutaCompleta = Paths.get(rutaBase, nombreArchivo);
 
             // Guardar archivo
             Files.copy(archivo.getInputStream(), rutaCompleta, StandardCopyOption.REPLACE_EXISTING);
 
-            // Retornar la ruta relativa o absoluta
+            // Retornar la ruta completa (puedes cambiar a relativa si lo necesitas)
             return rutaCompleta.toString();
 
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar la imagen", e);
         }
     }
+
+
+
+
+    @Override
+    public List<ImagenesIncidenciaDTO> getImagenesByHabitacion(Long idHabitacion) {
+        List<Incidencias> incidencias = incidenciasDao.findByIdHabitacion(idHabitacion);
+        List<ImagenesIncidenciaDTO> imagenes = new ArrayList<>();
+
+        for (Incidencias inc : incidencias) {
+            List<ImagenesIncidencia> imgs = imagenesIncidenciaDao.findByIncidenciaIdIncidenciaAndTipo(inc.getIdIncidencia(), "incidencia");
+            for(ImagenesIncidencia img : imgs){
+                img.setRutaImagen(convertirRutaFisicaAUrl(img.getRutaImagen()));
+            }
+            imagenes.addAll(imagenesIncidenciaMapper.toListDtos(imgs)); // suponiendo que tienes un mapper
+        }
+        return imagenes;
+    }
+
+
+
+    public String convertirRutaFisicaAUrl(String rutaFisica) {
+        String basePath = "C:\\Users\\Pedro J\\Desktop\\PROYECTO\\back-fct\\uploads\\incidencias\\";
+        String urlBase = "/uploads/incidencias/";
+
+        if (rutaFisica.startsWith(basePath)) {
+            // Extraigo la parte relativa (por ejemplo "17/imagen.jpg")
+            String relativePath = rutaFisica.substring(basePath.length()).replace("\\", "/");
+            return urlBase + relativePath;
+        }
+        return rutaFisica; // fallback por si algo falla
+    }
+
+
 
 
 
