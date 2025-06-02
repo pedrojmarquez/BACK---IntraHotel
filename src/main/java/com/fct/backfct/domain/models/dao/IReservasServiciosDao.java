@@ -8,4 +8,6 @@ import java.util.List;
 public interface IReservasServiciosDao extends JpaRepository<ReservasServicios, Long> {
 
     List<ReservasServicios> findByReserva_IdReserva(Long idReserva);
+
+
 }

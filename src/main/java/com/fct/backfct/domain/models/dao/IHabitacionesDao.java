@@ -19,10 +19,12 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
         SELECT r.habitacion.idHabitacion FROM Reservas r
         WHERE r.fechaEntrada < :fechaSalida
           AND r.fechaSalida > :fechaEntrada
-          AND r.estadoReserva.idEstadoReserva = 1
+          AND r.estadoReserva.idEstadoReserva IN (1,2,5)
     )
     AND (:tipo IS NULL OR h.tipo = :tipo)
     AND (:capacidad IS NULL OR h.capacidad = :capacidad)
+    AND h.estadoHabitacion.idEstado IN (1,2,5)
+    ORDER BY h.numeroHabitacion
 """)
     List<Habitaciones> findHabitacionesDisponibles(
             @Param("fechaEntrada") LocalDateTime fechaEntrada,
@@ -120,6 +122,9 @@ public interface IHabitacionesDao extends JpaRepository<Habitaciones, Long> {
     void actualizarLimpiezaDiariaParaOcupadas();
 
 
+    @Query("SELECT COUNT(h) FROM Habitaciones h WHERE h.estadoHabitacion.idEstado in (2, 5)")
+    Integer countHabitacionesOcupadas();
 
-
+    @Query("SELECT COUNT(h) FROM Habitaciones h WHERE h.estadoHabitacion.idEstado = 4")
+    Integer countHabitacionesMantenimiento();
 }

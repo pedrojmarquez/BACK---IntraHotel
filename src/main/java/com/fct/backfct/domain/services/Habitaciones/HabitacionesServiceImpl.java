@@ -183,8 +183,12 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
         List<ImagenesIncidencia> imagenesIncidencia= new java.util.ArrayList<>(List.of());
 
+        // 3. Eliminar las imágenes del mantenimiento anterior
+        List<ImagenesIncidencia> imagenesIncidenciaAnteriores = imagenesIncidenciaDao.findByIncidenciaIdIncidencia(incidencia.getIdIncidencia());
+        imagenesIncidenciaAnteriores.forEach(imagenesIncidenciaDao::delete);
 
-        // 3. Guardar las imágenes relacionadas
+
+        // 4. Guardar las imágenes relacionadas
         for (MultipartFile imagen : imagenes) {
             if (!imagen.isEmpty()) {
                 String ruta = guardarImagen(imagen, idHabitacion,"incidencias"); // Implementas esta función

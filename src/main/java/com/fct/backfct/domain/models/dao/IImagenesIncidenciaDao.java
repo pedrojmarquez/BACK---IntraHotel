@@ -9,4 +9,6 @@ public interface IImagenesIncidenciaDao extends JpaRepository<ImagenesIncidencia
 
     List<ImagenesIncidencia> findByIncidenciaIdIncidenciaAndTipo(Long idIncidencia, String tipo);
 
+    List<ImagenesIncidencia> findByIncidenciaIdIncidencia(Long idIncidencia);
+
 }

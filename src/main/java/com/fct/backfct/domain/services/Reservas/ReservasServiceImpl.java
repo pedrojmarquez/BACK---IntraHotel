@@ -14,8 +14,7 @@ import org.thymeleaf.context.Context;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -155,6 +154,8 @@ public class ReservasServiceImpl implements IReservasService {
             log.info("Reserva " + reserva.getIdReserva() + " guardada con factura " + facturaGuardada.getIdFactura());
             Habitaciones habitacion = reserva.getHabitacion();
 
+            log.info("Habitacion con estado  " + habitacion.getEstadoHabitacion().getIdEstado());
+
             //comprobamos que la la habitacion no tiene incidencias
             if(habitacion.getEstadoHabitacion().getIdEstado() == 5L){
                 habitacion.setEstadoHabitacion(estadosHabitacionDao.findById(4L).orElse(null));
@@ -226,6 +227,50 @@ public class ReservasServiceImpl implements IReservasService {
     @Override
     public List<ReservaServicioDTO> findServiciosByReservaId(Long idReserva) {
         return reservasServiciosMapper.toListDtos(reservasServiciosDao.findByReserva_IdReserva(idReserva));
+    }
+
+    @Override
+    public List<ReservaServicioDTO> updateServiciosContratados(List<ReservaServicioDTO> serviciosContratados) {
+        log.info("Actualizando servicios contratados: " + serviciosContratados);
+        List<ReservasServicios> serviciosContratadosEntities = reservasServiciosMapper.toListEntities(serviciosContratados);
+        List<ReservasServicios> serviciosContratadosActualizados = new ArrayList<>();
+        for(ReservasServicios servicio : serviciosContratadosEntities){
+
+            //si no existe por que no lo tenia contratado , entonces lo creamos
+            if(servicio.getIdReservaServicio() == null){
+                if(servicio.getCantidad() > 0 ){
+                    reservasServiciosDao.save(servicio);
+                }
+            }else{
+                if(servicio.getCantidad() > 0 ){
+                    ReservasServicios servicioExistente = reservasServiciosDao.findById(servicio.getIdReservaServicio()).orElse(null);
+                    servicioExistente.setCantidad(servicio.getCantidad());
+                    serviciosContratadosActualizados.add(servicioExistente);
+                    reservasServiciosDao.save(servicioExistente);
+                }else{
+                    ReservasServicios servicioExistente = reservasServiciosDao.findById(servicio.getIdReservaServicio()).orElse(null);
+                    reservasServiciosDao.delete(servicioExistente);
+                }
+            }
+
+        }
+
+        return reservasServiciosMapper.toListDtos(serviciosContratadosActualizados);
+    }
+
+    @Override
+    public Object getEstadisticas() {
+        Map<String, Integer> estadisticas = new HashMap<>();
+        //OBTENER NUMERO DE HABITACIONES OCUPADAS
+        estadisticas.put("numHabitaciones", habitacionesDao.countHabitacionesOcupadas());
+
+        //OBTENER NUMERO DE RESERVAS  PENDIENTES
+        estadisticas.put("numPendientes", reservasDao.countReservasPendientes());
+
+        //OBTENER NUMERO DE HABITACIONES EN MANTENIMIENTO
+        estadisticas.put("numMantenimiento", habitacionesDao.countHabitacionesMantenimiento());
+
+        return estadisticas;
     }
 
 }

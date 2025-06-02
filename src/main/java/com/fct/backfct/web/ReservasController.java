@@ -140,4 +140,24 @@ public class ReservasController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PutMapping("/servicios-contratados/update")
+    public ResponseEntity<List<ReservaServicioDTO>> updateServiciosContratados(@RequestBody List<ReservaServicioDTO> serviciosContratados) {
+        try {
+            return ResponseEntity.ok(reservasService.updateServiciosContratados(serviciosContratados));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/estadisticas")
+    public ResponseEntity<?> getEstadisticas() {
+        try {
+            return ResponseEntity.ok(reservasService.getEstadisticas());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

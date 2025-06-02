@@ -32,4 +32,8 @@ public interface IReservasService {
     Optional<LocalDateTime> obtenerFechaLimiteParaAmpliar(Long habitacionId, LocalDateTime fechaSalidaActual);
 
     List<ReservaServicioDTO> findServiciosByReservaId(Long idReserva);
+
+    List<ReservaServicioDTO> updateServiciosContratados(List<ReservaServicioDTO> serviciosContratados);
+
+    Object getEstadisticas();
 }

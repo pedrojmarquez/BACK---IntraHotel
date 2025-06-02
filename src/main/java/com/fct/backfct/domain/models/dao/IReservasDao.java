@@ -20,4 +20,6 @@ public interface IReservasDao extends JpaRepository<Reservas, Long> {
     @Query("SELECT r FROM Reservas r WHERE r.habitacion.idHabitacion = :habitacionId AND r.fechaEntrada > :fechaActual ORDER BY r.fechaEntrada ASC")
     List<Reservas> findSiguientesReservas(@Param("habitacionId") Long habitacionId, @Param("fechaActual") LocalDateTime fechaActual);
 
+    @Query("SELECT COUNT(r) FROM Reservas r WHERE r.estadoReserva.idEstadoReserva = 1")
+    Integer countReservasPendientes();
 }
