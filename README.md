@@ -49,10 +49,7 @@ spring.jpa.hibernate.ddl-auto=none
 
 3. Ejecuta la aplicación:
 
-```bash
-  ./mvnw spring-boot:run
-```
-o
+
 ```bash
   ./gradlew bootRun
 ```
