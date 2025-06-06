@@ -147,6 +147,7 @@ public class ReservasServiceImpl implements IReservasService {
 
             reserva.setEstadoReserva(estadoReservaDao.findById(4L).orElse(null));
 
+            //guardar la factura para conseguir el ID
             Facturas facturaGuardada = facturasMapper.toEntity(facturasService.save(facturaDTO));
             reserva.setIdfactura(facturaGuardada.getIdFactura());
 

@@ -65,11 +65,8 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/uploads/**").permitAll() // <-- permite acceso sin login
-
-//                .antMatchers( HttpMethod.POST,"/clientes/productos/save").hasAnyAuthority("tecnico", "coordinador-tecnico")
-//                .antMatchers( HttpMethod.POST,"/productos/**","/clientes/**","/centros/**").hasAuthority("coordinador-tecnico")
-//                .antMatchers( HttpMethod.PUT,"/productos/**","/clientes/**","/centros/**").hasAuthority("coordinador-tecnico")
-//                .antMatchers( HttpMethod.DELETE,"/productos/**","/clientes/**","/centros/**").hasAuthority("coordinador-tecnico")
+                .antMatchers( "/swagger-ui/**").permitAll()
+                .antMatchers( "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)

@@ -151,7 +151,7 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
     }
 
 
-    @Scheduled(cron = "0 0 6,14 * * *") // A las 06:00 y 14:00 cada día
+    @Scheduled(cron = "0 0 6 * * *") // Ejecuta solo a las 6:00
     public void marcarLimpiezaDiariaParaOcupadas() {
         log.info("Marcando limpieza diaria para habitaciones ocupadas");
         habitacionesDao.actualizarLimpiezaDiariaParaOcupadas();
@@ -248,7 +248,7 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
 
 
 
-    @Scheduled(fixedRate = 150000) // Cada 10 minutos (600,000 ms)
+    @Scheduled(fixedRate = 600000) // Cada 10 minutos (600,000 ms)
     public void procesarIncidenciasPendientes() {
         List<Incidencias> pendientes = incidenciasDao.findIncidenciasPendienteNotificacion(1L); // estado 1 = pendiente
         List<Incidencias> tramitando = incidenciasDao.findIncidenciasPendienteNotificacion(4L); // estado 2 = tramitando
@@ -338,28 +338,14 @@ public class HabitacionesServiceImpl implements IHabitacionesService {
             String rutaBaseProyecto = new File(".").getCanonicalPath();
             String rutaBase = rutaBaseProyecto + File.separator + "uploads" + File.separator + accion + File.separator + idHabitacion;
 
-            // Crear el directorio si no existe
             File dir = new File(rutaBase);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            } else {
-                // Si ya existe, eliminar todos los archivos existentes en esa carpeta
-                for (File file : dir.listFiles()) {
-                    if (file.isFile()) {
-                        file.delete();
-                    }
-                }
-            }
+            if (!dir.exists()) dir.mkdirs();
 
-            // Crear nombre único para el archivo
             String nombreArchivo = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
             Path rutaCompleta = Paths.get(rutaBase, nombreArchivo);
-
-            // Guardar archivo
             Files.copy(archivo.getInputStream(), rutaCompleta, StandardCopyOption.REPLACE_EXISTING);
+            return rutaBase + "/" + nombreArchivo;
 
-            // Retornar la ruta completa (puedes cambiar a relativa si lo necesitas)
-            return rutaCompleta.toString();
 
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar la imagen", e);
