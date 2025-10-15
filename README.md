@@ -40,6 +40,8 @@ cd back-fct
 
 2. Configura la base de datos:
 
+**[Descarga de la BBDD](https://drive.google.com/file/d/1HbVrHktwFwEwC3UeSMTTtpeG-ezdrY1m/view?usp=drive_link)** 
+
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/hotel
 spring.datasource.username=usuario
